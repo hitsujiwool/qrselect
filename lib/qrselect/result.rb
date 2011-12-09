@@ -9,13 +9,13 @@ module QRSelect
     
     def highest_score_text
       scores = @candidates.map { |text| text.score_to(@seed) }
-      @cadidates[scores.index(scores.max)]
+      @candidates[scores.index(scores.max)]
     end
 
     def to_hash
       {
         :seed => @seed.to_hash,
-        :candidates => @candidatates.map { |text| text.to_hash }
+        :candidates => @candidates.map { |text| text.to_hash }
       }
     end
   end

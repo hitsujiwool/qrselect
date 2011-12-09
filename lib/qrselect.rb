@@ -1,4 +1,5 @@
 require 'qrselect/config'
+require 'qrselect/dictionary'
 require 'qrselect/helper'
 require 'qrselect/result'
 require 'qrselect/result_collection'

@@ -2,12 +2,8 @@
 require 'spec_helper'
 
 describe QRSelect::Text, '' do
-  before(:all) do
-    QRSelect::Config.load
-  end
-
   it '英語と判定する' do
-    QRSelect::Text.new(open('http://colombiajournal.org/clinton-revises-colombia-drug-history.htm')).english?.should be_true
+    QRSelect::Text.new('http://colombiajournal.org/clinton-revises-colombia-drug-history.htm').english?.should be_true
   end
   
   it '英語ではないと判定する' do
@@ -15,7 +11,13 @@ describe QRSelect::Text, '' do
   end
 
   it '' do
-    text = QRSelect::Text.new(open('http://www.jca.apc.org/~kmasuoka/places/col101004.html'))
+    text = QRSelect::Text.new('http://www.jca.apc.org/~kmasuoka/places/col101004.html')
     p text.extract_links
+  end
+
+  it '対訳スコアの判定' do
+    ja_text = QRSelect::Text.new('http://www.jca.apc.org/~kmasuoka/places/col101004.html')
+    en_text = QRSelect::Text.new('http://colombiajournal.org/clinton-revises-colombia-drug-history.htm')
+    p ja_text.score_to(en_text)
   end
 end

@@ -22,7 +22,7 @@ module QRSelect
           loop do            
             result = collection.next
             block.call(result) if block_given?
-            y << collection
+            y << result
           end
         end
       end

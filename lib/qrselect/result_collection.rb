@@ -5,7 +5,7 @@ module QRSelect
   class ResultCollection < Delegator
     @checked = {}
 
-    def initialize(keyword, engine, recursive = true)
+    def initialize(keyword, engine, recursive = false)
       seed_urls = []
       ## きりがないのと、後ろの方の検索結果ではキーワードとの関連性が薄れてしまうので、とりあえず200件のみを調査する
       engine_enum = engine.new.to_enum(keyword, 200)

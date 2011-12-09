@@ -7,6 +7,7 @@ module QRSelect
       params = {}
 
       opt = OptionParser.new
+      config_path = Dir.getwd + 'akin/conf'
 
       ## 検索結果
       opt.on('-n NUMBER OF RESULTS', Integer) do |v|
@@ -28,6 +29,11 @@ module QRSelect
         params[:domain] = v
       end
 
+      ## 設定ファイルのパス
+      opt.on('-c CONFIG', String) do |v|
+        config_path = v
+      end
+
       if ARGV.empty?
         $stdout.puts 'Please input keywords!'        
       else
@@ -37,6 +43,8 @@ module QRSelect
         else
           keyword = ARGV.shift
           opt.parse!(ARGV)
+
+          Config.load(config_path)
           Main.new.fetch(keyword, params)
         end
       end
