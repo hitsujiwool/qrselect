@@ -5,7 +5,7 @@ module QRSelect
   class Dictionary
     def self.open(&block)
       username, host = Config::MYSQL_USER.split('@')      
-      @@db = Mysql2::Client.new(:host=> host, :username => username, :database => Config::MYSQL_DBNAME)
+      @@db = Mysql2::Client.new(:host=> host, :username => username, :password => Concif::MYSQL_PASSWORD, :database => Config::MYSQL_DBNAME)
       begin
         block.call(Dictionary.new)
       rescue
