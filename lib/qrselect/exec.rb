@@ -7,7 +7,7 @@ module QRSelect
       params = {}
 
       opt = OptionParser.new
-      config_path = Dir.getwd + 'akin/conf'
+      config_path = Dir.getwd + '/akin.conf'
 
       ## 検索結果
       opt.on('-n NUMBER OF RESULTS', Integer) do |v|
@@ -38,14 +38,23 @@ module QRSelect
         $stdout.puts 'Please input keywords!'        
       else
         keyword = ARGV.first
-        if keyword[0] === '-'
+        if keyword == '-h' || keyword == '--help'
+          opt.parse!(ARGV)
+        elsif keyword[0] === '-'
           $stdout.puts 'Please input keywords!'        
         else
           keyword = ARGV.shift
-          opt.parse!(ARGV)
-
           Config.load(config_path)
-          Main.new.fetch(keyword, params)
+          opt.parse!(ARGV)
+          Main.new.fetch(keyword, params) do |result|
+            print <<EOS
+========================================
+#{result.seed.title} (#{result.seed.url})
+#{result.candidates.length}件の対訳候補が見つかりました。
+#{result.highest_score_text.title} (#{result.highest_score_text.url}) 
+========================================
+EOS
+          end
         end
       end
     end
