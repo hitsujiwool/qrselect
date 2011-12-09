@@ -10,14 +10,14 @@ describe QRSelect::Text, '' do
     QRSelect::Text.new('http://www.jca.apc.org/~kmasuoka/places/col101004.html').english?.should be_false
   end
 
-  it '' do
+  it '原文へのリンクを抽出' do
     text = QRSelect::Text.new('http://www.jca.apc.org/~kmasuoka/places/col101004.html')
-    p text.extract_links
+    text.extract_links.length.should eq(1)
   end
 
   it '対訳スコアの判定' do
     ja_text = QRSelect::Text.new('http://www.jca.apc.org/~kmasuoka/places/col101004.html')
     en_text = QRSelect::Text.new('http://colombiajournal.org/clinton-revises-colombia-drug-history.htm')
-    p ja_text.score_to(en_text)
+    ja_text.score_to(en_text)
   end
 end
