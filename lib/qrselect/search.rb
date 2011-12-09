@@ -19,6 +19,14 @@ module QRSelect
           end
         end      
       end
+
+      private 
+
+      def hash_to_query_string(hash)
+        tmp = []
+        hash.each { |k, v| tmp << URI.encode(k.to_s) + '=' + URI.encode(v.to_s) }
+        tmp.join('&')      
+      end
     end
 
     class Bing < Base
@@ -39,7 +47,7 @@ module QRSelect
         query['Query'] = keyword
         query['Web.Count'] = limit.to_s
         query['Web.Offset'] = offset.to_s
-        @base_url + '?' + Helper.hash_to_query_string(query)
+        @base_url + '?' + hash_to_query_string(query)
       end
 
       def search(keyword, params = {})
