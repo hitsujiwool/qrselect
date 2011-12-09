@@ -30,7 +30,7 @@ module QRSelect
       end
 
       ## 設定ファイルのパス
-      opt.on('-c CONFIG', String) do |v|
+      opt.on('-c CONFIG FILE PATH', String) do |v|
         config_path = v
       end
 
@@ -44,8 +44,8 @@ module QRSelect
           $stdout.puts 'Please input keywords!'        
         else
           keyword = ARGV.shift
-          Config.load(config_path)
           opt.parse!(ARGV)
+          Config.load(config_path)
           Main.new.fetch(keyword, params) do |result|
             print <<EOS
 ========================================
