@@ -4,8 +4,8 @@
 ## インストール
     $ git clone https://github.com/hitsujiwool/qrselect.git qrselect
     $ cd qrselect
-	$ rake build
 	$ rake install
+	
 ## 使い方
 
 ### 設定ファイルのロード
@@ -36,19 +36,16 @@ akin.confはyamlで記述されているので、同等の内容をハッシュ�
       ## do something
     end
 	
-## オプション
+### オプション
 
 `QRselect.fetch`にはいくつかのオプションを渡すことができます。
 
-    QRselect.fetch('コロンビア 麻薬', :limit => 10,
-		                              :expand => true,
-									  :domain => 'ac.jp',
-									  :recursive => true)
+    QRselect.fetch('コロンビア 麻薬', :limit => 10, :expand => true, :domain => 'ac.jp', :recursive => true)
 
 * :limitは、出力される結果の件数を指定します（デフォルトは50）。
-* :expandがtrueの場合、akin.confに書かれた追加キーワードをクエリの末尾に付加して検索します。
-* :domainは、検索する日本語テキストのドメインを絞りこみます。
-* :recursiveがtrueの場合、原文の候補が見つかったときに、もとになった日本語ページと同一ドメインのページについても対訳を収集します。
+* :expandがtrueの場合、akin.confに書かれた追加キーワードをクエリの末尾に付加して検索します（デフォルトはfalse）。
+* :domainは、検索する日本語テキストのドメインを絞りこみます（デフォルトは指定なし）。
+* :recursiveがtrueの場合、原文の候補が見つかったときに、もとになった日本語ページと同一ドメインのページについても対訳を収集します（デフォルトはfalse）。
 
 
 ### コマンドラインからの利用
