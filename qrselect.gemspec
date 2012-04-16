@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency "rspec"
-  gem "nokogiri"
-  gem "mysql2"
+  s.add_dependency "nokogiri"
+  s.add_dependency "mysql2"
   # s.add_runtime_dependency "rest-client"
 end
