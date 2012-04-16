@@ -5,6 +5,7 @@ module QRSelect
       :expand => false,
       :domain => nil,
       :limit => 50,
+      :recursive => false,
       :engine => Search::Bing
     }
     
@@ -18,8 +19,8 @@ module QRSelect
       ## enumeratorを使って遅延評価
       enum = Enumerator.new do |y|
         keywords.each do |k|
-          collection = ResultCollection.new(k, params[:engine])
-          loop do            
+          collection = ResultCollection.new(k, params[:engine], params[:recursive])
+          loop do
             result = collection.next
             block.call(result) if block_given?
             y << result
