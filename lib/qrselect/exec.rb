@@ -10,27 +10,27 @@ module QRSelect
       config_path = Dir.getwd + '/akin.conf'
 
       ## 検索結果
-      opt.on('-n NUMBER OF RESULTS', Integer) do |v|
+      opt.on('-n NUMBER OF RESULTS', Integer, 'Number of results (default 50)') do |v|
         params[:limit] = v
       end
 
       ## キーワード拡張
-      opt.on('-e EXPAND KEYWORDS') do
+      opt.on('-e', 'Expand keywords (default false)') do
         params[:expand] = true
       end
 
       ## 対訳が見つかったページのドメインを沿えて再検索
-      opt.on('-r RECURSIVE') do
+      opt.on('-r', 'Search recursively (default false)') do
         params[:recursive] = true
       end
 
       ## ドメイン指定
-      opt.on('-d DOMAIN', String) do |v|
+      opt.on('-d DOMAIN', String, 'Limit domain') do |v|
         params[:domain] = v
       end
 
       ## 設定ファイルのパス
-      opt.on('-c CONFIG FILE PATH', String) do |v|
+      opt.on('-c CONFIG FILE PATH', String, 'Path to config file') do |v|
         config_path = v
       end
 
