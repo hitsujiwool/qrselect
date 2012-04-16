@@ -35,25 +35,32 @@ module QRSelect
       end
 
       if ARGV.empty?
-        $stdout.puts 'Please input keywords!'        
+        $stdout.puts 'Please input keywords!'
       else
         keyword = ARGV.first
         if keyword == '-h' || keyword == '--help'
           opt.parse!(ARGV)
         elsif keyword[0] === '-'
-          $stdout.puts 'Please input keywords!'        
+          $stdout.puts 'Please input keywords!'
         else
           keyword = ARGV.shift
           opt.parse!(ARGV)
           Config.load(config_path)
           Main.new.fetch(keyword, params) do |result|
-            print <<EOS
+          print <<EOS
 ========================================
-#{result.seed.title} (#{result.seed.url})
-#{result.candidates.length}件の対訳候補が見つかりました。
-#{result.highest_score_text.title} (#{result.highest_score_text.url}) 
+jp_url:#{result.seed.url}
+en_url:#{result.highest_score_text.url}
 ========================================
 EOS
+
+#            print <<EOS
+#========================================
+##{result.seed.title} (#{result.seed.url})
+##{result.candidates.length}件の対訳候補が見つかりました。
+##{result.highest_score_text.title} (#{result.highest_score_text.url})
+#========================================
+#EOS
           end
         end
       end
