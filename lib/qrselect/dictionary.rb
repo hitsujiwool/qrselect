@@ -3,19 +3,23 @@ require 'mysql2'
 
 module QRSelect
   class Dictionary
+    def initialize(db)
+      @db = db
+    end
+
     def self.open(&block)
       username, host = Config::MYSQL_USER.split('@')      
-      @@db = Mysql2::Client.new(:host=> host, :username => username, :password => Config::MYSQL_PASSWORD, :database => Config::MYSQL_DBNAME)
+      db = Mysql2::Client.new(:host=> host, :username => username, :password => Config::MYSQL_PASSWORD, :database => Config::MYSQL_DBNAME)
       begin
-        block.call(Dictionary.new)
-      rescue
-        @@db.close
+        block.call(Dictionary.new(db))
+      ensure
+        db.close
       end
     end
     
     def en_to_ja(word)
-      escaped = @@db.escape(word)
-      @@db.query("select jword from eijiro where eword = '#{escaped}'").map { |row|
+      escaped = @db.escape(word)
+      @db.query("select jword from eijiro where eword = '#{escaped}'").map { |row|
         row['jword'].split("\t").map { |word|
           word
             .delete('〜')

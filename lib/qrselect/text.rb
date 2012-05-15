@@ -56,6 +56,7 @@ module QRSelect
         
     def score_to(text)
       return @score[text.url] if @score.key?(text.url)
+      score = 0
       ## textに対するスコアを算出（textが英語の場合しか機能しない…）
       Dictionary.open do |dic|
         words_without_stop_words = text.word_freq.keys - STOP_WORDS
@@ -69,8 +70,8 @@ module QRSelect
         end
         score = total / words_without_stop_words.length.to_f        
         @score[text.url] = score
-        score
       end
+      score
     end
 
     def domain
