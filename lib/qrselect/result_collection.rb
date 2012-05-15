@@ -5,7 +5,7 @@ module QRSelect
   class ResultCollection < Delegator
     @checked = {}
 
-    def initialize(keyword, engine, recursive = false)
+    def initialize(keyword, footprint, engine, recursive = false)
       seed_urls = []
       ## きりがないのと、後ろの方の検索結果ではキーワードとの関連性が薄れてしまうので、とりあえず200件のみを調査する
       engine_enum = engine.new.to_enum(keyword, 200)
@@ -14,14 +14,14 @@ module QRSelect
           seed_urls << engine_enum.next if seed_urls.empty?
           url_info = seed_urls.shift
           ## もしチェック済みならスキップ
-          next if ResultCollection.checked?(url_info[:url])
+          next if footprint.visited?(url_info[:url])
           begin
             text = Text.new(url_info[:url], :title => url_info[:title])
           rescue
             next
           else
             result = Result.new(text)
-            ResultCollection.check(text.url)
+            footprint.visit(text.url)
             text.extract_links.each do |url|
               begin
                 candidate_text = Text.new(url)
@@ -44,16 +44,6 @@ module QRSelect
 
     def __getobj__
       @enum
-    end
-    
-    private 
-
-    def self.check(url)
-      @checked[url] = true
-    end
-    
-    def self.checked?(url)
-      @checked.key?(url)
-    end
+    end    
   end
 end

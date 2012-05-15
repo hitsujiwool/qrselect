@@ -12,6 +12,7 @@ module QRSelect
     def fetch (keyword, params = {}, &block)
       raise 'QRSelect::Config is not initialized.' unless Config.initialized?
       params = DEFAULTS.merge(params)
+      footprint = Footprint.new
       ## キーワードを展開して
       keywords = params[:expand] ? Config::ADDITIONAL_KEYWORDS.map { |k| "#{k} #{keyword}" } : [keyword]
       ## 必要ならばドメイン指定用のクエリを追加
@@ -19,7 +20,7 @@ module QRSelect
       ## enumeratorを使って遅延評価
       enum = Enumerator.new do |y|
         keywords.each do |k|
-          collection = ResultCollection.new(k, params[:engine], params[:recursive])
+          collection = ResultCollection.new(k, footprint, params[:engine], params[:recursive])
           loop do
             result = collection.next
             block.call(result) if block_given?

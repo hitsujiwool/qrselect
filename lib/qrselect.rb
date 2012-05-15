@@ -1,6 +1,7 @@
 require 'qrselect/config'
 require 'qrselect/dictionary'
 require 'qrselect/exec'
+require 'qrselect/footprint'
 require 'qrselect/result'
 require 'qrselect/result_collection'
 require 'qrselect/search'
