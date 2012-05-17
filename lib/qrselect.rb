@@ -14,7 +14,7 @@ module QRSelect
   def self.config(params)
     if params.is_a?(String)
       Config.load(params)
-    else 
+    else
       Config.init(params)
     end
   end
