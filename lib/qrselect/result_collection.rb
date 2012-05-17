@@ -31,9 +31,8 @@ module QRSelect
                 result.candidates << candidate_text if candidate_text.english?
               end
             end
-            y << result
             unless result.candidates.empty?             
-              ## もしrecursiveオプションが有効なら再度検索して調査対象を拡大
+              y << result
               ## きりがないので、1回のリクエストで取得できる検索結果の最大値(50)しか追加しない
               seed_urls.push(*engine.new.search(keyword + " site:#{text.domain}")) if recursive
             end

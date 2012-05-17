@@ -9,6 +9,10 @@ module QRSelect
       :engine => Search::Bing
     }
     
+    def close
+      @closed = true
+    end
+    
     def fetch (keyword, params = {}, &block)
       raise 'QRSelect::Config is not initialized.' unless Config.initialized?
       params = DEFAULTS.merge(params)
@@ -22,6 +26,7 @@ module QRSelect
         keywords.each do |k|
           collection = ResultCollection.new(k, footprint, params[:engine], params[:recursive])
           loop do
+            break if @closed
             result = collection.next
             block.call(result) if block_given?
             y << result
