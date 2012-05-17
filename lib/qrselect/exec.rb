@@ -7,7 +7,7 @@ module QRSelect
       params = {}
 
       opt = OptionParser.new
-      config_path = Dir.getwd + '/akin.conf'
+      config_path = Dir.getwd + '/qrselect.conf'
 
       ## 検索結果
       opt.on('-n NUMBER OF RESULTS', Integer, 'Number of results (default 50)') do |v|
@@ -53,14 +53,6 @@ jp_url:#{result.seed.url}
 en_url:#{result.highest_score_text.url}
 ========================================
 EOS
-
-#            print <<EOS
-#========================================
-##{result.seed.title} (#{result.seed.url})
-##{result.candidates.length}件の対訳候補が見つかりました。
-##{result.highest_score_text.title} (#{result.highest_score_text.url})
-#========================================
-#EOS
           end
         end
       end
