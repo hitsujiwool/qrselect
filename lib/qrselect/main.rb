@@ -28,8 +28,10 @@ module QRSelect
           loop do
             break if @closed
             result = collection.next
-            block.call(result) if block_given?
-            y << result
+            unless result.candidates.empty?
+              block.call(result) if block_given?
+              y << result
+            end
           end
         end
       end

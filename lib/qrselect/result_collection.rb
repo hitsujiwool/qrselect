@@ -4,7 +4,7 @@ require 'delegate'
 module QRSelect
   class ResultCollection < Delegator
     @checked = {}
-
+    
     def initialize(keyword, footprint, engine, recursive = false)
       seed_urls = []
       ## きりがないのと、後ろの方の検索結果ではキーワードとの関連性が薄れてしまうので、とりあえず200件のみを調査する
@@ -31,8 +31,8 @@ module QRSelect
                 result.candidates << candidate_text if candidate_text.english?
               end
             end
+            y << result
             unless result.candidates.empty?             
-              y << result
               ## きりがないので、1回のリクエストで取得できる検索結果の最大値(50)しか追加しない
               seed_urls.push(*engine.new.search(keyword + " site:#{text.domain}")) if recursive
             end
