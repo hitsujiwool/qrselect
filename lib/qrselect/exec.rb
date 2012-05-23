@@ -15,8 +15,12 @@ module QRSelect
       end
 
       ## キーワード拡張
-      opt.on('-e', 'Expand keywords (default false)') do
-        params[:expand] = true
+      opt.on('-e [KEYWORDS SEPARATED BY COMMAS]', String, 'Expand keywords (default false)') do |v|
+        if v.nil?
+          params[:expand] = true
+        else
+          params[:expand] = v.split(',').map(&:strip)
+        end
       end
 
       ## 対訳が見つかったページのドメインを沿えて再検索
