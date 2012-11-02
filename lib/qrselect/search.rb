@@ -1,17 +1,18 @@
+# -*- coding: utf-8 -*-
 require 'uri'
-require 'nokogiri'
-require 'open-uri'
-require 'delegate'
+require 'json'
+require 'net/https'
 
 module QRSelect
   module Search
     class Base
-      def to_enum(keyword, limit = nil)
+      def to_enum(keyword, offset = 0)
+        footprint = {}
         Enumerator.new do |y|
-          offset = 0
           loop do
-            results = search(keyword, :offset => offset)
-            break if results.empty? || (limit && limit <= offset)
+            results = search(keyword, { :offset => offset }, footprint)
+            # もし新しい結果が得られなかったらおしまい
+            break if results.empty?
             results.each do |result|
               y << result
               offset += 1
@@ -22,7 +23,7 @@ module QRSelect
 
       private 
 
-      def hash_to_query_string(hash)
+      def hash_to_querystring(hash)
         tmp = []
         hash.each { |k, v| tmp << URI.encode(k.to_s) + '=' + URI.encode(v.to_s) }
         tmp.join('&')      
@@ -32,51 +33,63 @@ module QRSelect
     class Bing < Base
       @@max_result_per_page = 50
 
-      def initialize
-        @base_url = 'http://api.bing.net/xml.aspx'
-        @query = {
-          'AppId' => Config::BING_APP_ID,
-          'Version' => '2.2',
-          'Market' => 'ja-JP',
-          'Sources' => 'Web',
-        }
+      def initialize(account_key)
+        @account_key = account_key
+        @base_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/SearchWeb/Web'
       end
 
-      def generate_url(keyword, limit, offset)
-        query = @query.clone
-        query['Query'] = keyword
-        query['Web.Count'] = limit.to_s
-        query['Web.Offset'] = offset.to_s
-        @base_url + '?' + hash_to_query_string(query)
-      end
-
-      def search(keyword, params = {})
+      def search(keyword, params = {}, footprint = {})
+        results = []
         limit = params[:limit] || @@max_result_per_page
         offset = params[:offset] || 0
-        doc = Nokogiri::XML(open(generate_url(keyword, [limit, @@max_result_per_page].min, offset)))
-        ns = {
-          'default' => 'http://schemas.microsoft.com/LiveSearch/2008/04/XML/element',
-          'web' => 'http://schemas.microsoft.com/LiveSearch/2008/04/XML/web'
-        }
-        results = []
-        unless doc.at('/default:SearchResponse/default:Errors', ns)
-          total = doc.at('//web:Total', ns).inner_text.to_i
-          if offset < total
-            real_offset = doc.at('//web:Offset', ns).inner_text.to_i
-            doc.xpath('//web:WebResult', ns).each do |node|
-              results << {
-                :title => node.xpath('web:Title', ns).inner_text,
-                :url => node.xpath('web:Url', ns).inner_text,
-                :description => node.xpath('web:Description', ns).inner_text
-              }
-            end
-            if limit - @@max_result_per_page > 0 && results.length + real_offset < total
-              results = results.concat(search(keyword, :limit => limit - @@max_result_per_page, :offset => @@max_result_per_page))
-            end
-          end
+        url = URI.parse(@base_url)
+        https = Net::HTTP.new(url.host, url.port)
+        https.use_ssl = true
+        https.start do |https|
+          results = request(https, url.path, keyword, limit, offset, footprint)
         end
         results
-      end      
+      end  
+
+      private
+
+      def build_querystring(keyword, limit, offset)
+        query = {}
+        query['Query'] = "'" + keyword + "'"
+        query['$top'] = limit.to_s
+        query['$skip'] = offset.to_s
+        query['$format'] = 'JSON'
+        hash_to_querystring(query)        
+      end
+
+      def request(http, path, keyword, limit, offset, footprint)
+        results = []
+        # Bingが勝手にoffsetを修正してわけがわからないことになるので、残り件数にかかわらず、常にlimitを上限にしてリクエストする
+        req = Net::HTTP::Get.new(path + '?' + build_querystring(keyword, @@max_result_per_page, offset))
+        req.basic_auth(@account_key, @account_key)
+        res = http.request(req)
+        begin
+          json = JSON.parse(res.body)
+          json['d']['results'].each do |result|            
+            # offset修正ですでに取得済みのものを重複して取得した場合は無視
+            next if footprint[result['Url']]
+            footprint[result['Url']] = true
+            limit -= 1
+            offset += 1
+            results << {
+              :title => result['Title'],
+              :url => result['Url'],
+              :descriptions => result['Description']
+            }
+            # 要求している分だけ取得できたらおしまいなので、ループを抜けつつ結果を返す
+            return results if limit == 0
+          end
+          # もし次ページの検索結果がある場合は再帰的に取得
+          results += request(http, path, keyword, limit, offset, footprint) if !json['d']['__next'].nil?
+        rescue
+        end
+        results
+      end
     end
     
     class Yahoo
