@@ -8,7 +8,7 @@ module QRSelect
     end
     
     def highest_score_text
-      scores = @candidates.map { |text| text.score_to(@seed) }
+      scores = @candidates.map { |text| @seed.score_to(text) }
       @candidates[scores.index(scores.max)]
     end
 
