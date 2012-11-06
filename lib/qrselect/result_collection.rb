@@ -7,11 +7,14 @@ module QRSelect
     
     def initialize(keyword, footprint, engine, recursive = false)
       seed_urls = []
-      ## きりがないのと、後ろの方の検索結果ではキーワードとの関連性が薄れてしまうので、とりあえず200件のみを調査する
-      engine_enum = engine.new.to_enum(keyword, 200)
+      search_api = engine.new(Config::BING_ACCOUNT_KEY)
+      search_enum = search_api.to_enum(keyword)
+      count = 0
       @enum = Enumerator.new do |y|
         loop do
-          seed_urls << engine_enum.next if seed_urls.empty?
+          ## 探索が100件を越えたら打ち切り
+          break if count > 100
+          seed_urls << search_enum.next if seed_urls.empty?
           url_info = seed_urls.shift
           ## もしチェック済みならスキップ
           next if footprint.visited?(url_info[:url])
@@ -31,10 +34,11 @@ module QRSelect
                 result.candidates << candidate_text if candidate_text.english?
               end
             end
+            count += 1
             y << result
             unless result.candidates.empty?             
               ## きりがないので、1回のリクエストで取得できる検索結果の最大値(50)しか追加しない
-              seed_urls.push(*engine.new.search(keyword + " site:#{text.domain}")) if recursive
+              seed_urls.push(*search_api.search(keyword + " site:#{text.domain}")) if recursive
             end
           end
         end
