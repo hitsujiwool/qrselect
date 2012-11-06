@@ -51,13 +51,7 @@ module QRSelect
           opt.parse!(ARGV)
           Config.load(config_path)
           Main.new.fetch(keyword, params) do |result|
-            next if result.candidates.empty?
-            print <<EOS
-========================================
-jp_url:#{result.seed.url}
-en_url:#{result.highest_score_text.url}
-========================================
-EOS
+            puts result.to_hash.to_json
           end
         end
       end
