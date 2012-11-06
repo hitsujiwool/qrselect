@@ -15,7 +15,11 @@ module QRSelect
     def to_hash
       {
         :seed => @seed.to_hash,
-        :candidates => @candidates.map { |text| text.to_hash }
+        :candidates => @candidates.map { |text|
+          hash = text.to_hash
+          hash[:score] = @seed.score_to(text)
+          hash
+        }
       }
     end
   end
