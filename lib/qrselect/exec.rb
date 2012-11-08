@@ -51,7 +51,7 @@ module QRSelect
           opt.parse!(ARGV)
           Config.load(config_path)
           Main.new.fetch(keyword, params) do |result|
-            puts result.to_hash.to_json
+            puts result.to_hash.to_json + "\0"
           end
         end
       end
